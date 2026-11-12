@@ -4,9 +4,10 @@ import { AppService } from './app.service.js';
 import { RecruitersModule } from './recruiters/recruiters.module.js';
 import { ApplicationsModule } from './applications/applications.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
+import { SavedInternshipsModule } from './saved-internships/saved-internships.module.js';
 
 @Module({
-  imports: [RecruitersModule, ApplicationsModule, NotificationsModule],
+  imports: [RecruitersModule, ApplicationsModule, NotificationsModule, SavedInternshipsModule],
   controllers: [AppController],
   providers: [AppService],
 })
