@@ -18,6 +18,18 @@ export class Users {
   @Column({ name: 'full_name', type: 'varchar', length: 100 })
   fullName: string;
 
+  @Column({
+    name: 'password_hash',
+    type: 'varchar',
+    length: 255,
+    select: false,
+    default: '',
+  })
+  passwordHash: string;
+
+  @Column({ type: 'varchar', length: 20, default: 'STUDENT' })
+  role: string;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 
