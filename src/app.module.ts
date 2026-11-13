@@ -6,9 +6,10 @@ import { ApplicationsModule } from './applications/applications.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { SavedInternshipsModule } from './saved-internships/saved-internships.module.js';
 import { SavedSearchesModule } from './saved-searches/saved-searches.module.js';
+import { AlertPreferencesModule } from './alert-preferences/alert-preferences.module.js';
 
 @Module({
-  imports: [RecruitersModule, ApplicationsModule, NotificationsModule, SavedInternshipsModule, SavedSearchesModule],
+  imports: [RecruitersModule, ApplicationsModule, NotificationsModule, SavedInternshipsModule, SavedSearchesModule, AlertPreferencesModule],
   controllers: [AppController],
   providers: [AppService],
 })
