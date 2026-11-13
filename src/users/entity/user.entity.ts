@@ -30,6 +30,26 @@ export class Users {
   @Column({ type: 'varchar', length: 20, default: 'STUDENT' })
   role: string;
 
+  @Column({ name: 'email_verified', type: 'boolean', default: false })
+  emailVerified: boolean;
+
+  @Column({
+    name: 'email_verification_token_hash',
+    type: 'varchar',
+    length: 128,
+    nullable: true,
+    select: false,
+  })
+  emailVerificationTokenHash: string | null;
+
+  @Column({
+    name: 'email_verification_expires_at',
+    type: 'timestamptz',
+    nullable: true,
+    select: false,
+  })
+  emailVerificationExpiresAt: Date | null;
+
   @CreateDateColumn({ name: 'created_at', type: 'timestamptz' })
   createdAt: Date;
 

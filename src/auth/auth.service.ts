@@ -21,12 +21,21 @@ import {
 } from './auth.constants.js';
 import { JwtPayload } from './jwtStrategy.strategy.js';
 import { RefreshTokenDto } from './dto/refresh-token.dto.js';
+import { VerifyEmailDto } from './dto/verify-email.dto.js';
+import { randomToken, sha256 } from './token.util.js';
+import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
+import { MailService } from '../mail/mail.service.js';
+import { ResetPasswordDto } from './dto/reset-password.dto.js';
+import { ChangePasswordDto } from './dto/change-password.dto.js';
+
+const TOKEN_EXPIRES_MS = 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectRepository(Users) private readonly userRepo: Repository<Users>,
     private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
   ) {}
 
   private async register(
@@ -39,14 +48,24 @@ export class AuthService {
     if (mail) {
       throw new ConflictException('Email already Exists!');
     }
+
+    const token = randomToken();
     try {
       const user = this.userRepo.create({
         fullName: reg.fullName,
         email: reg.email.toLowerCase(),
         passwordHash: await bcrypt.hash(reg.password, 16),
         role,
+        emailVerificationTokenHash: sha256(token),
+        emailVerificationExpiresAt: new Date(Date.now() + TOKEN_EXPIRES_MS),
       });
       const saved = await this.userRepo.save(user);
+
+      await this.mailService.send(
+        saved.email,
+        'Verify your Internly Account',
+        `<p>Hi ${saved.fullName},</p><p>Your Verification Token: </p><p><b>${token}</b></p>`,
+      );
 
       const { passwordHash: _hash, ...safeUser } = saved;
       return safeUser as Users;
@@ -110,6 +129,120 @@ export class AuthService {
       throw new UnauthorizedException('User no longer exists');
     }
     return this.issueToken(user);
+  }
+
+  async verifyEmail(mail: VerifyEmailDto): Promise<{ email: string }> {
+    const user = await this.userRepo.findOneBy({
+      emailVerificationTokenHash: sha256(mail.token),
+    });
+
+    if (!user) {
+      throw new BadRequestException('Invalid or Expired Token!');
+    }
+    if (
+      !user.emailVerificationExpiresAt ||
+      user.emailVerificationExpiresAt < new Date()
+    ) {
+      throw new BadRequestException('Verification Token has Expired!');
+    }
+
+    await this.userRepo.update(
+      {
+        id: user.id,
+      },
+      {
+        emailVerified: true,
+        emailVerificationTokenHash: null,
+        emailVerificationExpiresAt: null,
+      },
+    );
+    return { email: user.email };
+  }
+
+  async forgotPassword(pass: ForgotPasswordDto): Promise<string> {
+    const user = await this.userRepo.findOneBy({
+      email: pass.email.toLowerCase(),
+    });
+
+    if (user) {
+      const token = randomToken();
+      await this.userRepo.update(
+        {
+          id: user.id,
+        },
+        {
+          emailVerificationTokenHash: sha256(token),
+          emailVerificationExpiresAt: new Date(Date.now() + TOKEN_EXPIRES_MS),
+        },
+      );
+      await this.mailService.send(
+        user.email,
+        'Reset your password',
+        `<p>Your password reset token:</p><p><b>${token}</b></p>`,
+      );
+    }
+
+    return 'A Reset token has been sent';
+  }
+
+  async resetPassword(reset: ResetPasswordDto): Promise<string> {
+    const user = await this.userRepo.findOneBy({
+      emailVerificationTokenHash: sha256(reset.token),
+    });
+
+    if (!user) {
+      throw new BadRequestException('Invalid or Expired Token!');
+    }
+    if (
+      !user.emailVerificationExpiresAt ||
+      user.emailVerificationExpiresAt < new Date()
+    ) {
+      throw new BadRequestException('Reset Token has Expired!');
+    }
+
+    await this.userRepo.update(
+      {
+        id: user.id,
+      },
+      {
+        passwordHash: await bcrypt.hash(reset.password, 16),
+        emailVerificationTokenHash: null,
+        emailVerificationExpiresAt: null,
+      },
+    );
+    return 'Password has been reset Successfully!';
+  }
+
+  async changePassword(
+    change: ChangePasswordDto,
+    user: Users,
+  ): Promise<string> {
+    const found = await this.userRepo.findOne({
+      where: { id: user.id },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        role: true,
+        passwordHash: true,
+      },
+    });
+    if (!found) {
+      throw new UnauthorizedException('User no longer Exists!');
+    }
+    const matchPass = await bcrypt.compare(
+      change.currentPassword,
+      found.passwordHash,
+    );
+    if (!matchPass) {
+      throw new BadRequestException('Current password is Incorrect!');
+    }
+    await this.userRepo.update(
+      { id: found.id },
+      { passwordHash: await bcrypt.hash(change.newPassword, 16) },
+    );
+
+    return 'Password updated Successfully';
   }
 
   private issueToken(user: Users): {
