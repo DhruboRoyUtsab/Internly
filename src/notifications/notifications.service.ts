@@ -18,4 +18,19 @@ export class NotificationsService {
       notificationId: id,
     };
   }
+
+  markAllAsRead() {
+    return {
+      message:
+        'Mark all notifications as read will be implemented with database integration.',
+    };
+  }
+
+  remove(id: string) {
+    return {
+      message:
+        'Notification deletion will be implemented with database integration.',
+      notificationId: id,
+    };
+  }
 }
