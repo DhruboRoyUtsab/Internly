@@ -79,6 +79,7 @@ export class StudentVerificationService {
   async reviewStudentVerification(
     id: string,
     review: ReviewStudentVerificationDto,
+    adminId: string,
   ): Promise<StudentVerifications> {
     const verify = await this.getStudentVerificationById(id);
 
@@ -87,7 +88,7 @@ export class StudentVerificationService {
       {
         status: review.status,
         adminNote: review.adminNote ?? null,
-        reviewedBy: review.reviewedBy ?? null,
+        reviewedBy: adminId,
         reviewedAt: new Date(),
       },
     );

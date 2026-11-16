@@ -11,7 +11,4 @@ export class ReviewStudentVerificationDto {
   @MaxLength(255)
   adminNote?: string;
 
-  @IsOptional()
-  @IsUUID()
-  reviewedBy?: string;
 }
