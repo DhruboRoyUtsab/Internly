@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailModule } from './mail/mail.module.js';
 import { StudentProfileModule } from './student-profile/student-profile.module.js';
+import { StudentVerificationModule } from './student-verification/student-verification.module.js';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { StudentProfileModule } from './student-profile/student-profile.module.j
     AuthModule,
     MailModule,
     StudentProfileModule,
+    StudentVerificationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
