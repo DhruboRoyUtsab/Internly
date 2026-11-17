@@ -1,5 +1,5 @@
 import pg from 'pg';
-import bcrypt from 'bcryptjs';
+import bcrypt from 'bcrypt';
 
 const { Client } = pg;
 
