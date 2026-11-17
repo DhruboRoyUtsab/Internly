@@ -18,3 +18,5 @@ export class AlertPreferencesController {
     return this.alertPreferencesService.update(dto);
   }
 }
+
+
