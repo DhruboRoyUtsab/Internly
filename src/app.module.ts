@@ -1,14 +1,19 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { RecruitersModule } from './recruiters/recruiters.module.js';
 import { UsersModule } from './users/users.module.js';
 import { AuthModule } from './auth/auth.module.js';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { MailModule } from './mail/mail.module.js';
 import { StudentProfileModule } from './student-profile/student-profile.module.js';
 import { StudentVerificationModule } from './student-verification/student-verification.module.js';
 import { AdminUsersModule } from './admin-users/admin-users.module.js';
+import { ApplicationsModule } from './applications/applications.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
+import { SavedInternshipsModule } from './saved-internships/saved-internships.module.js';
+import { SavedSearchesModule } from './saved-searches/saved-searches.module.js';
+import { AlertPreferencesModule } from './alert-preferences/alert-preferences.module.js';
 
 @Module({
   imports: [
@@ -29,6 +34,11 @@ import { AdminUsersModule } from './admin-users/admin-users.module.js';
     StudentProfileModule,
     StudentVerificationModule,
     AdminUsersModule,
+    ApplicationsModule,
+    NotificationsModule,
+    SavedInternshipsModule,
+    SavedSearchesModule,
+    AlertPreferencesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
