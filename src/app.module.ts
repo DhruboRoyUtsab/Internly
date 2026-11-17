@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { RecruitersModule } from './recruiters/recruiters.module.js';
+import { InternshipsModule } from './internships/internships.module.js';
 import { UsersModule } from './users/users.module.js';
 import { AuthModule } from './auth/auth.module.js';
 import { MailModule } from './mail/mail.module.js';
@@ -28,6 +29,7 @@ import { AlertPreferencesModule } from './alert-preferences/alert-preferences.mo
       synchronize: true,
     }),
     RecruitersModule,
+    InternshipsModule,
     UsersModule,
     AuthModule,
     MailModule,
