@@ -1,33 +1,46 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
-import { AuthModule } from './auth/auth.module.js';
 import { RecruitersModule } from './recruiters/recruiters.module.js';
 import { InternshipsModule } from './internships/internships.module.js';
-import { UsersStubModule } from './users/users.module.js';
+import { UsersModule } from './users/users.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { MailModule } from './mail/mail.module.js';
+import { StudentProfileModule } from './student-profile/student-profile.module.js';
+import { StudentVerificationModule } from './student-verification/student-verification.module.js';
+import { AdminUsersModule } from './admin-users/admin-users.module.js';
+import { ApplicationsModule } from './applications/applications.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
+import { SavedInternshipsModule } from './saved-internships/saved-internships.module.js';
+import { SavedSearchesModule } from './saved-searches/saved-searches.module.js';
+import { AlertPreferencesModule } from './alert-preferences/alert-preferences.module.js';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
-    AuthModule,
-    TypeOrmModule.forRootAsync({
-      inject: [ConfigService],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres' as const,
-        host: config.get<string>('DB_HOST', 'localhost'),
-        port: config.get<number>('DB_PORT', 5432),
-        username: config.get<string>('DB_USER', 'postgres'),
-        password: config.get<string>('DB_PASSWORD') ?? '',
-        database: config.get<string>('DB_NAME', 'internly'),
-        autoLoadEntities: true,
-        synchronize: true,
-      }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: process.env.DB_HOST ?? 'localhost',
+      port: Number(process.env.DB_PORT ?? 5432),
+      username: process.env.DB_USERNAME ?? 'postgres',
+      password: process.env.DB_PASSWORD ?? '',
+      database: process.env.DB_NAME ?? 'internly',
+      autoLoadEntities: true,
+      synchronize: true,
     }),
-    UsersStubModule,
     RecruitersModule,
     InternshipsModule,
+    UsersModule,
+    AuthModule,
+    MailModule,
+    StudentProfileModule,
+    StudentVerificationModule,
+    AdminUsersModule,
+    ApplicationsModule,
+    NotificationsModule,
+    SavedInternshipsModule,
+    SavedSearchesModule,
+    AlertPreferencesModule,
   ],
   controllers: [AppController],
   providers: [AppService],

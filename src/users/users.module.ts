@@ -1,7 +1,13 @@
 import { Module } from '@nestjs/common';
+import { UsersService } from './users.service.js';
+import { UsersController } from './users.controller.js';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { User } from './entities/user.entity.js';
+import { Users } from './entity/user.entity.js';
 
-/** STUB - replaced by Member 1's UsersModule. Registers the User entity so relations resolve. */
-@Module({ imports: [TypeOrmModule.forFeature([User])], exports: [TypeOrmModule] })
-export class UsersStubModule {}
+@Module({
+  imports: [TypeOrmModule.forFeature([Users])],
+  controllers: [UsersController],
+  providers: [UsersService],
+  exports: [UsersService],
+})
+export class UsersModule {}

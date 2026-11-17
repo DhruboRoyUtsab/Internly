@@ -1,5 +1,5 @@
 import { Column, Entity, Index, JoinColumn, OneToOne, PrimaryGeneratedColumn } from 'typeorm';
-import { User } from '../../users/entities/user.entity.js';
+import { Users } from '../../users/entity/user.entity.js';
 
 @Entity('recruiter_profile')
 export class RecruiterProfileEntities {
@@ -10,9 +10,9 @@ export class RecruiterProfileEntities {
   @Index({ unique: true })
   recruiterId: string;
 
-  @OneToOne(() => User, { onDelete: 'CASCADE' })
+  @OneToOne(() => Users, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'user_id' })
-  user: User;
+  user: Users;
 
   @Column({ type: 'varchar', length: 30, nullable: true })
   phone: string | null;
