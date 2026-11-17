@@ -9,6 +9,7 @@ import {
   Req,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AdminUsersService } from './admin-users.service.js';
 import { JwtGuard } from '../auth/jwtGuard.guard.js';
@@ -21,12 +22,15 @@ import {
   PaginationMeta,
 } from '../users/dto/admin-list-users.dto.js';
 
+@ApiTags('Admin: Users')
+@ApiBearerAuth()
 @UseGuards(JwtGuard, RolesGuard)
 @Roles('ADMIN')
 @Controller('admin/users')
 export class AdminUsersController {
   constructor(private readonly adminUsersService: AdminUsersService) {}
 
+  @ApiOperation({ summary: 'List users with search, role/status filters and pagination' })
   @Get()
   listUsers(
     @Query() query: AdminListUserDto,
@@ -34,6 +38,7 @@ export class AdminUsersController {
     return this.adminUsersService.listUsers(query);
   }
 
+  @ApiOperation({ summary: 'Change a user role (admins cannot change their own)' })
   @Patch(':id/role')
   updateRole(
     @Param('id', ParseUUIDPipe) id: string,
@@ -43,6 +48,7 @@ export class AdminUsersController {
     return this.adminUsersService.updateRole(id, body.role, req.user.id);
   }
 
+  @ApiOperation({ summary: 'Suspend a user (admins cannot suspend themselves)' })
   @Patch(':id/suspend')
   suspend(
     @Param('id', ParseUUIDPipe) id: string,
@@ -51,6 +57,7 @@ export class AdminUsersController {
     return this.adminUsersService.setStatus(id, 'SUSPENDED', req.user.id);
   }
 
+  @ApiOperation({ summary: 'Reactivate a suspended user' })
   @Patch(':id/activate')
   activate(
     @Param('id', ParseUUIDPipe) id: string,
