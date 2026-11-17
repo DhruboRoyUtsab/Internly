@@ -22,20 +22,16 @@ async function bootstrap() {
 
   const config = new DocumentBuilder()
     .setTitle('Internly API')
-    .setDescription(
-      'Internly Backend REST API - Authentication, Student Profiles, Verification, Recruiters, Internships, Applications, Notifications, Premium Subscriptions, Stripe Payments, and Audit Logs',
-    )
+    .setDescription('The Internly API documentation')
     .setVersion('1.0')
     .addBearerAuth(
       {
         type: 'http',
         scheme: 'bearer',
         bearerFormat: 'JWT',
-        name: 'JWT',
-        description: 'Enter JWT Bearer token or supply x-user-id header',
         in: 'header',
       },
-      'JWT-auth',
+      'bearer',
     )
     .build();
 
