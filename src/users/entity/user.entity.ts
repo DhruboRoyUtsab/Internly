@@ -30,6 +30,9 @@ export class Users {
   @Column({ type: 'varchar', length: 20, default: 'STUDENT' })
   role: string;
 
+  @Column({ type: 'varchar', length: 20, default: 'ACTIVE' })
+  status: string;
+
   @Column({ name: 'email_verified', type: 'boolean', default: false })
   emailVerified: boolean;
 

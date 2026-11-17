@@ -8,11 +8,15 @@ import {
   Patch,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service.js';
 import { CreateUserDto } from './dto/create-user.dto.js';
 import { Users } from './entity/user.entity.js';
 import { UpdateUserDto } from './dto/update-user.dto.js';
+import { JwtGuard } from '../auth/jwtGuard.guard.js';
+import { RolesGuard } from '../common/guards/roles.guard.js';
+import { Roles } from '../common/decorators/roles.decorator.js';
 
 @Controller('users')
 export class UsersController {
@@ -49,11 +53,15 @@ export class UsersController {
     return this.usersService.replaceUser(id, updateUser);
   }
 
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles('ADMIN')
   @Delete(':id')
   deleteUser(@Param('id', ParseUUIDPipe) id: string): Promise<string> {
     return this.usersService.deleteUser(id);
   }
 
+  @UseGuards(JwtGuard, RolesGuard)
+  @Roles('ADMIN')
   @Delete('soft/:id')
   deleteUserSoft(@Param('id', ParseUUIDPipe) id: string): Promise<string> {
     return this.usersService.deleteUserSoft(id);
