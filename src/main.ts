@@ -1,7 +1,8 @@
+import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module.js';
 import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AllExceptionsFilter } from './common/filters/http-exception.filter.js';
 import { TransformInterceptor } from './common/interceptors/transform.interceptor.js';
 
@@ -20,9 +21,9 @@ async function bootstrap() {
   app.useGlobalInterceptors(new TransformInterceptor());
 
   const config = new DocumentBuilder()
-    .setTitle('INTERNLY API')
+    .setTitle('Internly API')
     .setDescription(
-      'INTERNLY Backend REST API - Premium Subscriptions, Stripe Payments, Entitlement Service, Admin Operations, Audit Logs, Recommendations and Insights',
+      'Internly Backend REST API - Authentication, Student Profiles, Verification, Recruiters, Internships, Applications, Notifications, Premium Subscriptions, Stripe Payments, and Audit Logs',
     )
     .setVersion('1.0')
     .addBearerAuth(

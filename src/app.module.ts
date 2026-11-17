@@ -3,7 +3,25 @@ import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+
+// Member 1 Modules
+import { UsersModule } from './users/users.module.js';
+import { AuthModule } from './auth/auth.module.js';
+import { MailModule } from './mail/mail.module.js';
+import { StudentProfileModule } from './student-profile/student-profile.module.js';
+import { StudentVerificationModule } from './student-verification/student-verification.module.js';
+import { AdminUsersModule } from './admin-users/admin-users.module.js';
+
+// Member 2 Modules
 import { RecruitersModule } from './recruiters/recruiters.module.js';
+import { InternshipsModule } from './internships/internships.module.js';
+
+// Member 3 Modules
+import { ApplicationsModule } from './applications/applications.module.js';
+import { NotificationsModule } from './notifications/notifications.module.js';
+import { SavedInternshipsModule } from './saved-internships/saved-internships.module.js';
+import { SavedSearchesModule } from './saved-searches/saved-searches.module.js';
+import { AlertPreferencesModule } from './alert-preferences/alert-preferences.module.js';
 
 // Member 4 Modules
 import { SubscriptionsModule } from './subscriptions/subscriptions.module.js';
@@ -13,14 +31,6 @@ import { RecommendationsModule } from './recommendations/recommendations.module.
 
 // Middleware
 import { RequestLoggerMiddleware } from './common/middleware/request-logger.middleware.js';
-
-// Entities
-import { User } from './users/entities/user.entity.js';
-import { PremiumPlan } from './subscriptions/entities/premium-plan.entity.js';
-import { Subscription } from './subscriptions/entities/subscription.entity.js';
-import { Payment } from './payments/entities/payment.entity.js';
-import { AuditLog } from './audit-logs/entities/audit-log.entity.js';
-import { StripeEvent } from './payments/entities/stripe-event.entity.js';
 
 @Module({
   imports: [
@@ -35,18 +45,29 @@ import { StripeEvent } from './payments/entities/stripe-event.entity.js';
       username: process.env.DB_USERNAME ?? 'postgres',
       password: process.env.DB_PASSWORD ?? 'adib',
       database: process.env.DB_NAME ?? 'internly_db',
-      entities: [
-        User,
-        PremiumPlan,
-        Subscription,
-        Payment,
-        AuditLog,
-        StripeEvent,
-      ],
-      synchronize: true,
       autoLoadEntities: true,
+      synchronize: true,
     }),
+    // Member 1
+    UsersModule,
+    AuthModule,
+    MailModule,
+    StudentProfileModule,
+    StudentVerificationModule,
+    AdminUsersModule,
+
+    // Member 2
     RecruitersModule,
+    InternshipsModule,
+
+    // Member 3
+    ApplicationsModule,
+    NotificationsModule,
+    SavedInternshipsModule,
+    SavedSearchesModule,
+    AlertPreferencesModule,
+
+    // Member 4
     AuditLogsModule,
     SubscriptionsModule,
     PaymentsModule,
