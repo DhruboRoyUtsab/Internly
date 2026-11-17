@@ -7,7 +7,7 @@ export class UpdateAlertPreferenceDto {
 
   @IsOptional()
   @IsBoolean()
-  inAppEnabled!: boolean;
+  inAppEnabled?: boolean;
 
   @IsOptional()
   @IsBoolean()

@@ -4,7 +4,3 @@ export class SaveInternshipDto {
   @IsUUID()
   internshipId!: string;
 }
-
-
-
-

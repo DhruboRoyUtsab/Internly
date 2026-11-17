@@ -15,4 +15,3 @@ export class SavedInternshipQueryDto {
   @Max(100)
   limit?: number;
 }
-

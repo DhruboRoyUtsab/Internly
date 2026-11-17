@@ -22,7 +22,7 @@ export class ApplicationStatusHistory{
     application!: Application;
 
     @RelationId((history: ApplicationStatusHistory) => history.application)
-    applicatinId: string;
+    applicationId: string;
 
     @Column({
         name: 'from_status',

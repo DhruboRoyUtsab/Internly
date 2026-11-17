@@ -15,6 +15,7 @@ import { NotificationsModule } from './notifications/notifications.module.js';
 import { SavedInternshipsModule } from './saved-internships/saved-internships.module.js';
 import { SavedSearchesModule } from './saved-searches/saved-searches.module.js';
 import { AlertPreferencesModule } from './alert-preferences/alert-preferences.module.js';
+import { EmailIntegrationModule } from './email-integration/email-integration.module.js';
 
 @Module({
   imports: [
@@ -41,6 +42,7 @@ import { AlertPreferencesModule } from './alert-preferences/alert-preferences.mo
     SavedInternshipsModule,
     SavedSearchesModule,
     AlertPreferencesModule,
+    EmailIntegrationModule,
   ],
   controllers: [AppController],
   providers: [AppService],
