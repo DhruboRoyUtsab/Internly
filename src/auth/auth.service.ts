@@ -54,7 +54,7 @@ export class AuthService {
       const user = this.userRepo.create({
         fullName: reg.fullName,
         email: reg.email.toLowerCase(),
-        passwordHash: await bcrypt.hash(reg.password, 16),
+        passwordHash: await bcrypt.hash(reg.password, 12),
         role,
         emailVerificationTokenHash: sha256(token),
         emailVerificationExpiresAt: new Date(Date.now() + TOKEN_EXPIRES_MS),
@@ -205,7 +205,7 @@ export class AuthService {
         id: user.id,
       },
       {
-        passwordHash: await bcrypt.hash(reset.password, 16),
+        passwordHash: await bcrypt.hash(reset.password, 12),
         emailVerificationTokenHash: null,
         emailVerificationExpiresAt: null,
       },
@@ -239,7 +239,7 @@ export class AuthService {
     }
     await this.userRepo.update(
       { id: found.id },
-      { passwordHash: await bcrypt.hash(change.newPassword, 16) },
+      { passwordHash: await bcrypt.hash(change.newPassword, 12) },
     );
 
     return 'Password updated Successfully';
