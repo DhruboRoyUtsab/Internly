@@ -1,12 +1,7 @@
-import{
-    IsNotEmpty,
-    IsString,
-} from 'class-validator'
+import { IsNotEmpty, IsString } from 'class-validator';
 
-
-export class CreateApplicationDto{
-    @IsNotEmpty()
-    @IsString()
-    coverLetterText!: string;
+export class CreateApplicationDto {
+  @IsNotEmpty()
+  @IsString()
+  coverLetterText!: string;
 }
-

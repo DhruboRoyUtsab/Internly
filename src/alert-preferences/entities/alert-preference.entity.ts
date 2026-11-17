@@ -1,5 +1,6 @@
 import {
   Column,
+  CreateDateColumn,
   Entity,
   Index,
   PrimaryGeneratedColumn,
@@ -55,7 +56,7 @@ export class AlertPreference {
   })
   marketingEmails!: boolean;
 
-  @UpdateDateColumn({
+  @CreateDateColumn({
     name: 'created_at',
     type: 'timestamptz',
   })

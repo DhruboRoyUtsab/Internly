@@ -22,6 +22,7 @@ import { NotificationsModule } from './notifications/notifications.module.js';
 import { SavedInternshipsModule } from './saved-internships/saved-internships.module.js';
 import { SavedSearchesModule } from './saved-searches/saved-searches.module.js';
 import { AlertPreferencesModule } from './alert-preferences/alert-preferences.module.js';
+import { EmailIntegrationModule } from './email-integration/email-integration.module.js';
 
 // Member 4 Modules
 import { SubscriptionsModule } from './subscriptions/subscriptions.module.js';
@@ -66,6 +67,7 @@ import { RequestLoggerMiddleware } from './common/middleware/request-logger.midd
     SavedInternshipsModule,
     SavedSearchesModule,
     AlertPreferencesModule,
+    EmailIntegrationModule,
 
     // Member 4
     AuditLogsModule,

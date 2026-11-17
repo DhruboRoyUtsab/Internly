@@ -1,18 +1,20 @@
-import{
-    IsNotEmpty,
-    IsString,
-    IsOptional,
-    MaxLength,
-} from 'class-validator'
+import {
+  IsIn,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MaxLength,
+} from 'class-validator';
 
-export class UpdateApplicationStatusDto{
-    @IsString()
-    @IsNotEmpty()
-    @MaxLength(30)
-    status!: string;
+import { APPLICATION_STATUSES } from '../constants/application-status.constant.js';
 
-    @IsOptional()
-    @IsString()
-    @MaxLength(500)
-    note?: string;
+export class UpdateApplicationStatusDto {
+  @IsIn(APPLICATION_STATUSES)
+  @IsNotEmpty()
+  status!: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  note?: string;
 }

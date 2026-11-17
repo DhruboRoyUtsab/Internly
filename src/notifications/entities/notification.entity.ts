@@ -1,7 +1,7 @@
 import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn } from "typeorm";
 
 
-@Entity('notification')
+@Entity('notifications')
 @Index('IDX_notifications_recipient_read',[
     'recipientUserId',
     'isRead', 
