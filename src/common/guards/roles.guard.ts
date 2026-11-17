@@ -12,7 +12,7 @@ export class RolesGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const roles = this.reflector.getAllAndOverride<string[]>(ROLES_KEY, [
+    const roles = this.reflector.getAllAndOverride<(string)[]>(ROLES_KEY, [
       context.getHandler(),
       context.getClass(),
     ]);
@@ -23,11 +23,12 @@ export class RolesGuard implements CanActivate {
 
     const { user } = context.switchToHttp().getRequest();
 
-    if (!user || !roles.includes(user.role)) {
+    if (!user || !roles.some((r) => r.toUpperCase() === (user.role || '').toUpperCase())) {
       throw new ForbiddenException(
-        'You DO NOT have PERMISSION to ACCESS this Resource!',
+        `Access denied. Requires one of the following roles: ${roles.join(', ')}`,
       );
     }
+
     return true;
   }
 }
