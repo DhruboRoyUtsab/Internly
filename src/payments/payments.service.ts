@@ -80,6 +80,151 @@ export class PaymentsService {
   }
 
   /**
+   * 1.5 Built-In 1-Click Demo Payment System (Simulates $4.99 payment without needing real Stripe keys)
+   * Runs the exact multi-table transaction:
+   * Updates Subscription -> Creates Payment -> Writes stripe_events idempotency record -> Writes AuditLog
+   */
+  async processDemoPayment(
+    userId: string,
+    dto: { planId?: string },
+  ): Promise<{
+    success: boolean;
+    message: string;
+    subscription: Subscription;
+    payment: Payment;
+  }> {
+    let user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user) {
+      user = this.userRepository.create({
+        id: userId,
+        email: 'student@internly.edu',
+        fullName: 'Demo Student',
+        role: 'STUDENT',
+        emailVerified: true,
+      });
+      await this.userRepository.save(user);
+    }
+
+    let plan: PremiumPlan | null = null;
+    if (dto.planId) {
+      plan = await this.planRepository.findOne({ where: { id: dto.planId } });
+    }
+    if (!plan) {
+      plan = await this.planRepository.findOne({ where: { name: 'Premium Student Plan' } });
+    }
+    if (!plan) {
+      plan = await this.planRepository.findOne({ where: { isActive: true } });
+    }
+    if (!plan) {
+      throw new NotFoundException('No active Premium plan found in database.');
+    }
+
+    const now = new Date();
+    const periodEnd = new Date();
+    periodEnd.setDate(periodEnd.getDate() + 30);
+
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+      let subscription = await queryRunner.manager.findOne(Subscription, {
+        where: { userId: user.id },
+      });
+
+      const oldStatus = subscription?.status ?? null;
+      const demoSubId = `sub_demo_${Date.now()}`;
+      const demoSessionId = `cs_demo_${Date.now()}`;
+      const demoPaymentIntentId = `pi_demo_${Date.now()}`;
+      const demoEventId = `evt_demo_${Date.now()}`;
+
+      if (!subscription) {
+        subscription = queryRunner.manager.create(Subscription, {
+          userId: user.id,
+          planId: plan.id,
+          status: SubscriptionStatus.ACTIVE,
+          stripeSubscriptionId: demoSubId,
+          stripeCustomerId: `cus_demo_${user.id.slice(0, 8)}`,
+          currentPeriodStart: now,
+          currentPeriodEnd: periodEnd,
+          cancelAtPeriodEnd: false,
+        });
+      } else {
+        subscription.planId = plan.id;
+        subscription.status = SubscriptionStatus.ACTIVE;
+        subscription.stripeSubscriptionId = subscription.stripeSubscriptionId ?? demoSubId;
+        subscription.currentPeriodStart = now;
+        subscription.currentPeriodEnd = periodEnd;
+        subscription.cancelAtPeriodEnd = false;
+        subscription.canceledAt = null;
+      }
+
+      subscription = await queryRunner.manager.save(subscription);
+
+      const payment = queryRunner.manager.create(Payment, {
+        userId: user.id,
+        subscriptionId: subscription.id,
+        amount: Number(plan.price),
+        currency: plan.currency,
+        status: PaymentStatus.SUCCEEDED,
+        stripePaymentIntentId: demoPaymentIntentId,
+        stripeCheckoutSessionId: demoSessionId,
+        paymentMethod: 'card (demo simulation)',
+        receiptUrl: `https://internly.test/receipts/${demoPaymentIntentId}`,
+      });
+
+      const savedPayment = await queryRunner.manager.save(payment);
+
+      const stripeEvent = queryRunner.manager.create(StripeEvent, {
+        id: demoEventId,
+        type: 'checkout.session.completed',
+        status: 'PROCESSED',
+        payload: {
+          id: demoEventId,
+          type: 'checkout.session.completed',
+          simulation: true,
+          amount: Number(plan.price),
+          userId: user.id,
+          planId: plan.id,
+        },
+        processedAt: now,
+      });
+
+      await queryRunner.manager.save(stripeEvent);
+
+      await this.auditLogsService.log({
+        actorId: user.id,
+        actorEmail: user.email,
+        actorRole: 'STUDENT',
+        action: 'DEMO_SUBSCRIPTION_ACTIVATED',
+        entityName: 'Subscription',
+        entityId: subscription.id,
+        oldValues: { status: oldStatus },
+        newValues: {
+          status: SubscriptionStatus.ACTIVE,
+          planId: plan.id,
+          price: plan.price,
+          periodEnd,
+        },
+      });
+
+      await queryRunner.commitTransaction();
+
+      return {
+        success: true,
+        message: 'Demo payment completed successfully! Premium subscription is now ACTIVE for 30 days.',
+        subscription,
+        payment: savedPayment,
+      };
+    } catch (err) {
+      await queryRunner.rollbackTransaction();
+      throw err;
+    } finally {
+      await queryRunner.release();
+    }
+  }
+
+  /**
    * 2. Webhook Processor with Idempotency & Database Transaction
    */
   async handleWebhook(rawBody: Buffer | string, signature: string): Promise<{ received: boolean; message?: string }> {
