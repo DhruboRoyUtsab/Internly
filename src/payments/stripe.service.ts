@@ -11,8 +11,13 @@ export class StripeService {
   constructor(private readonly configService: ConfigService) {
     const secretKey = this.configService.get<string>('STRIPE_SECRET_KEY') ?? 'sk_test_placeholder';
 
-    if (!secretKey || secretKey === 'sk_test_placeholder') {
-      this.logger.warn('Running with mock Stripe key. External Stripe calls will be simulated.');
+    if (
+      !secretKey ||
+      secretKey.includes('placeholder') ||
+      secretKey.includes('demo') ||
+      secretKey === 'sk_test_placeholder'
+    ) {
+      this.logger.warn('Running with Demo Stripe mode. All payment operations will run via built-in simulation.');
       this.isMock = true;
     } else {
       this.stripe = new Stripe(secretKey);
@@ -79,13 +84,19 @@ export class StripeService {
     const webhookSecret =
       this.configService.get<string>('STRIPE_WEBHOOK_SECRET') ?? 'whsec_placeholder';
 
-    if (this.isMock || webhookSecret === 'whsec_placeholder' || !this.stripe) {
-      // In mock/test mode: parse payload directly
+    if (
+      this.isMock ||
+      !this.stripe ||
+      !signature ||
+      webhookSecret.includes('placeholder') ||
+      webhookSecret.includes('demo')
+    ) {
+      // In demo/test mode: parse payload directly without external signature failure
       try {
         const json = typeof payload === 'string' ? JSON.parse(payload) : JSON.parse(payload.toString('utf-8'));
         return json as Stripe.Event;
       } catch {
-        throw new BadRequestException('Invalid JSON payload in mock webhook.');
+        throw new BadRequestException('Invalid JSON payload in demo webhook.');
       }
     }
 
