@@ -133,8 +133,16 @@ export class AuthService {
   }
 
   async verifyEmail(mail: VerifyEmailDto): Promise<{ email: string }> {
-    const user = await this.userRepo.findOneBy({
-      emailVerificationTokenHash: sha256(mail.token),
+    const user = await this.userRepo.findOne({
+      where: { emailVerificationTokenHash: sha256(mail.token) },
+      select: {
+        id: true,
+        email: true,
+        fullName: true,
+        emailVerified: true,
+        emailVerificationTokenHash: true,
+        emailVerificationExpiresAt: true,
+      },
     });
 
     if (!user) {
