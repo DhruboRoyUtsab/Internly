@@ -68,4 +68,24 @@ export class InternshipsService {
 
     return await this.repo.findOne({ where: { id } });
   }
+
+
+  async deleteInternship(user: AuthenticatedUser, id: string): Promise<void> {
+    const internship = await this.repo.findOne({
+      where: { id },
+      relations: { recruiter: true },
+    });
+    if (!internship) {
+      throw new NotFoundException('Internship not found');
+    }
+
+    if (
+      user.role !== UserRole.ADMIN &&
+      internship.recruiter.recruiterId !== user.id
+    ) {
+      throw new ForbiddenException('You can only delete your own internships');
+    }
+
+    await this.repo.delete({ id });
+  }
 }
