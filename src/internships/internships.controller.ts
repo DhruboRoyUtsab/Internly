@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { InternshipsService } from './internships.service.js';
 import { Roles } from '../common/decorators/roles.decorator.js';
@@ -45,5 +45,13 @@ export class InternshipsController {
     @Body() dto: UpdateInternshipDto,
   ): Promise<Internship | null> {
     return this.internshipsService.updateInternship(user, id, dto);
+  }
+
+  @Delete(':id')
+  async deleteInternship(
+    @CurrentUser() user: AuthenticatedUser,
+    @Param('id', ParseUUIDPipe) id: string,
+  ): Promise<void> {
+    return this.internshipsService.deleteInternship(user, id);
   }
 }
