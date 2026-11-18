@@ -21,6 +21,7 @@ import {
 } from './auth.constants.js';
 import { JwtPayload } from './jwtStrategy.strategy.js';
 import { RefreshTokenDto } from './dto/refresh-token.dto.js';
+import { ResendVerificationDto } from './dto/resend-verification.dto.js';
 import { VerifyEmailDto } from './dto/verify-email.dto.js';
 import { randomToken, sha256 } from './token.util.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
@@ -28,7 +29,7 @@ import { MailService } from '../mail/mail.service.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
 
-const TOKEN_EXPIRES_MS = 24 * 60 * 60 * 1000;
+const TOKEN_EXPIRES_MS = 7 * 24 * 60 * 60 * 1000;
 
 @Injectable()
 export class AuthService {
@@ -183,6 +184,37 @@ export class AuthService {
     }
 
     return 'A Reset token has been sent';
+  }
+
+  async resendVerificationEmail(dto: ResendVerificationDto): Promise<string> {
+    const user = await this.userRepo.findOneBy({
+      email: dto.email.toLowerCase(),
+    });
+
+    if (!user) {
+      return 'If that email exists, a verification token has been sent';
+    }
+
+    if (user.emailVerified) {
+      return 'This account is already verified';
+    }
+
+    const token = randomToken();
+    await this.userRepo.update(
+      { id: user.id },
+      {
+        emailVerificationTokenHash: sha256(token),
+        emailVerificationExpiresAt: new Date(Date.now() + TOKEN_EXPIRES_MS),
+      },
+    );
+
+    await this.mailService.send(
+      user.email,
+      'Verify your Internly Account',
+      `<p>Hi ${user.fullName},</p><p>Your Verification Token: </p><p><b>${token}</b></p>`,
+    );
+
+    return 'If that email exists, a verification token has been sent';
   }
 
   async resetPassword(reset: ResetPasswordDto): Promise<string> {

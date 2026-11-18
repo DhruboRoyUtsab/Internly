@@ -7,6 +7,7 @@ import { RegisterRecruiterDto } from './dto/register-recruiter.dto.js';
 import { LoginDto } from './dto/login.dto.js';
 import { RefreshTokenDto } from './dto/refresh-token.dto.js';
 import { VerifyEmailDto } from './dto/verify-email.dto.js';
+import { ResendVerificationDto } from './dto/resend-verification.dto.js';
 import { ForgotPasswordDto } from './dto/forgot-password.dto.js';
 import { ResetPasswordDto } from './dto/reset-password.dto.js';
 import { ChangePasswordDto } from './dto/change-password.dto.js';
@@ -49,6 +50,14 @@ export class AuthController {
   @Post('verify-email')
   verifyEmail(@Body() verify: VerifyEmailDto): Promise<{ email: string }> {
     return this.authService.verifyEmail(verify);
+  }
+
+  @ApiOperation({ summary: 'Re-send the verification email (for unverified accounts)' })
+  @Post('resend-verification')
+  resendVerification(
+    @Body() resend: ResendVerificationDto,
+  ): Promise<string> {
+    return this.authService.resendVerificationEmail(resend);
   }
 
   @ApiOperation({ summary: 'Request a password reset token by email' })
