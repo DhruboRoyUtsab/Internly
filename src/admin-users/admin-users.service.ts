@@ -29,11 +29,11 @@ export class AdminUsersService {
       qb.andWhere('u.role = :role', { role: query.role });
     }
     if (query.status) {
-      qb.andWhere('u.status = :status', { role: query.status });
+      qb.andWhere('u.status = :status', { status: query.status });
     }
     if (query.q) {
       qb.andWhere('(u.email ILIKE :q OR u.fullName ILIKE :q)', {
-        q: `%&{query.q}`,
+        q: `%${query.q}%`,
       });
     }
     const [users, total] = await qb.getManyAndCount();
