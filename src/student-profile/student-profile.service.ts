@@ -39,11 +39,17 @@ export class StudentProfileService {
   }
 
   async getAllStudentProfiles(): Promise<StudentProfiles[]> {
-    return this.profileRepo.find({ order: { createdAt: 'DESC' } });
+    return this.profileRepo.find({
+      relations: { user: true },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async getStudentProfileById(id: string): Promise<StudentProfiles> {
-    const profile = await this.profileRepo.findOneBy({ id });
+    const profile = await this.profileRepo.findOne({
+      where: { id },
+      relations: { user: true },
+    });
 
     if (!profile) {
       throw new NotFoundException('Student profile not found!');
